@@ -1,6 +1,6 @@
 const express = require('express');
 const nodemailer = require('nodemailer');
-const emailValidator = require('../util/emailValidator.js');
+const emailValidator = require('../util/emailValidator');
 
 const router = express.Router();
 
