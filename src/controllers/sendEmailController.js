@@ -12,16 +12,16 @@ router.post('/', async function (req, res) {
   try {
     const { recipientEmail, htmlContent, emailSubject } = req.body;
     if (!recipientEmail) {
-      res.json({ status: 400, message: 'Email is required.' });
+      res.status(400).json({ status: 400, message: 'Email is required.' });
       return;
     }
     const isValidEmail = emailValidator.isEmailValid(recipientEmail);
     if (!isValidEmail) {
-      res.json({ status: 400, message: 'Please enter a valid email address.' });
+      res.status(400).json({ status: 400, message: 'Please enter a valid email address.' });
       return;
     }
     if (!htmlContent) {
-      res.json({ status: 400, message: 'htmlContent field is required.' });
+      res.status(400).json({ status: 400, message: 'htmlContent field is required.' });
       return;
     }
     const accessToken = await oAuth2Client.getAccessToken();
@@ -44,9 +44,9 @@ router.post('/', async function (req, res) {
       subject: emailSubject || '',
       html: htmlContent,
     });
-    res.json({ staus: 200, message: 'Email sent successfully.' });
+    res.status(200).json({ staus: 200, message: 'Email sent successfully.' });
   } catch (error) {
-    res.json({ status: 500, message: error.message });
+    res.status(500).json({ status: 500, message: error.message });
   }
 });
 
