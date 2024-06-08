@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const sendEmailController = require('../src/controllers/sendEmailController');
+const generateTemplateDataController = require('../src/controllers/generateTemplateDataController');
 
 const app = express();
 app.use(cors());
@@ -11,6 +12,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/send-email', sendEmailController);
+app.use('/api/generate-template-data', generateTemplateDataController);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
