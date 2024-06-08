@@ -1,18 +1,12 @@
 const express = require('express');
+const router = express.Router();
 const nodemailer = require('nodemailer');
 const emailValidator = require('../util/emailValidator');
+const { google } = require('googleapis');
+require('dotenv').config();
 
-const router = express.Router();
-
-const nodeMailerTransport = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,
-  secure: false,
-  auth: {
-    user: 'velocity.template.preview@gmail.com',
-    pass: process.env.GMAIL_APP_PASSWORD,
-  },
-});
+const oAuth2Client = new google.auth.OAuth2(process.env.CLIENT_ID, process.env.CLIENT_SECRET, process.env.REDIRECT_URI);
+oAuth2Client.setCredentials({ refresh_token: process.env.REFRESH_TOKEN });
 
 router.post('/', async function (req, res) {
   try {
@@ -30,9 +24,24 @@ router.post('/', async function (req, res) {
       res.json({ status: 400, message: 'htmlContent field is required.' });
       return;
     }
+    const accessToken = await oAuth2Client.getAccessToken();
+    const nodeMailerTransport = nodemailer.createTransport({
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false,
+      auth: {
+        type: 'OAuth2',
+        user: 'velocity.template.preview@gmail.com',
+        clientId: process.env.CLIENT_ID,
+        clientSecret: process.env.CLIENT_SECRET,
+        refreshToken: process.env.REFRESH_TOKEN,
+        accessToken: accessToken,
+      },
+    });
     await nodeMailerTransport.sendMail({
+      from: 'Velocity Template Preview <velocity.template.preview@gmail.com>',
       to: recipientEmail,
-      subject: emailSubject || '[Test Email] Sent from velocity-template-preview.web.app 😉',
+      subject: emailSubject || '',
       html: htmlContent,
     });
     res.json({ staus: 200, message: 'Email sent successfully.' });
