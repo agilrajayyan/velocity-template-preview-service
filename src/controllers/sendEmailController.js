@@ -9,21 +9,21 @@ const oAuth2Client = new google.auth.OAuth2(process.env.CLIENT_ID, process.env.C
 oAuth2Client.setCredentials({ refresh_token: process.env.REFRESH_TOKEN });
 
 router.post('/', async function (req, res) {
+  const { recipientEmail, htmlContent, emailSubject } = req.body;
+  if (!recipientEmail) {
+    res.status(400).json({ status: 400, message: 'Email is required.' });
+    return;
+  }
+  const isValidEmail = emailValidator.isEmailValid(recipientEmail);
+  if (!isValidEmail) {
+    res.status(400).json({ status: 400, message: 'Please enter a valid email address.' });
+    return;
+  }
+  if (!htmlContent) {
+    res.status(400).json({ status: 400, message: 'htmlContent field is required.' });
+    return;
+  }
   try {
-    const { recipientEmail, htmlContent, emailSubject } = req.body;
-    if (!recipientEmail) {
-      res.status(400).json({ status: 400, message: 'Email is required.' });
-      return;
-    }
-    const isValidEmail = emailValidator.isEmailValid(recipientEmail);
-    if (!isValidEmail) {
-      res.status(400).json({ status: 400, message: 'Please enter a valid email address.' });
-      return;
-    }
-    if (!htmlContent) {
-      res.status(400).json({ status: 400, message: 'htmlContent field is required.' });
-      return;
-    }
     const accessToken = await oAuth2Client.getAccessToken();
     const nodeMailerTransport = nodemailer.createTransport({
       host: 'smtp.gmail.com',
