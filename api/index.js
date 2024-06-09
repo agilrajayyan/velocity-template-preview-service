@@ -4,7 +4,7 @@ const sendEmailController = require('../src/controllers/sendEmailController');
 const generateTemplateDataController = require('../src/controllers/generateTemplateDataController');
 
 const app = express();
-app.use(cors());
+app.use(cors({ origin: 'https://velocity-template-preview.web.app' }));
 app.use(express.json());
 
 app.get('/', (req, res) => {
